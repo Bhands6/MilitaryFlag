@@ -7,7 +7,6 @@
 
 ![前端](https://img.shields.io/badge/技术栈-HTML%20%2B%20CSS%20%2B%20JS-f7df1e) ![依赖](https://img.shields.io/badge/npm%20依赖-0-brightgreen) ![构建](https://img.shields.io/badge/构建-无需-orange) ![棋盘](https://img.shields.io/badge/棋盘-12%20%C3%97%205-blue) ![部署](https://img.shields.io/badge/部署-GitHub%20Pages-181717) ![Version](https://img.shields.io/badge/version-v1.0-pink)
 
-**在线体验**：暂未部署（不会自动部署）· 本地运行见下方 👇
 
 </div>
 
