@@ -5,7 +5,7 @@
 **一个纯前端的单机军旗（陆战棋）网页小游戏**
 —— 红方由你执子，蓝方 AI 在暗棋模式下推演；行营、铁路、工兵飞铁路、司令亮旗全部实现，战报全程记录。
 
-![前端](https://img.shields.io/badge/技术栈-HTML%20%2B%20CSS%20%2B%20JS-f7df1e) [棋盘](https://img.shields.io/badge/棋盘-12%20%C3%97%205-blue) ![部署](https://img.shields.io/badge/部署-GitHub%20Pages-181717) ![Version](https://img.shields.io/badge/version-v1.0-pink)
+![前端](https://img.shields.io/badge/技术栈-HTML%20%2B%20CSS%20%2B%20JS-f7df1e) ![棋盘](https://img.shields.io/badge/棋盘-12%20%C3%97%205-blue) ![部署](https://img.shields.io/badge/部署-GitHub%20Pages-181717) ![Version](https://img.shields.io/badge/version-v1.0-pink)
 
 
 </div>
