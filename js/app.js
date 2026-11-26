@@ -12,6 +12,7 @@
   var PREFS_KEY = 'junqi.prefs';
 
   var ui = {
+    mode: 'solo',
     selected: null,
     hints: [],
     busy: false,
@@ -23,6 +24,7 @@
 
   var game = new Engine.Game();
   var aiTimer = null;
+  var soloActive = false;
   var boardEl, toastEl, soundBtn;
 
   /* ---------------- 音效 ---------------- */
@@ -127,7 +129,7 @@
   }
 
   function onBoardClick(e) {
-    if (ui.busy) return;
+    if (!soloActive || ui.busy) return;
     var c = cellFromEvent(e);
     if (!c) return;
 
@@ -286,6 +288,7 @@
   }
 
   function onToolbarClick(e) {
+    if (!soloActive) return;
     var btn = e.target.closest('[data-act]');
     if (!btn || btn.disabled) return;
     var act = btn.getAttribute('data-act');
@@ -343,9 +346,12 @@
     boardEl.addEventListener('click', onBoardClick);
 
     document.getElementById('toolbar').addEventListener('click', onToolbarClick);
-    document.getElementById('newGameBtn').addEventListener('click', function () { newGame(true); });
+    document.getElementById('newGameBtn').addEventListener('click', function () {
+      if (soloActive) newGame(true);
+    });
 
     document.getElementById('overlay').addEventListener('click', function (e) {
+      if (!soloActive) return;
       var btn = e.target.closest('[data-act]');
       if (!btn) return;
       var act = btn.getAttribute('data-act');
@@ -368,6 +374,7 @@
     });
 
     document.addEventListener('keydown', function (e) {
+      if (!soloActive) return;
       if (e.key === 'Escape') {
         ui.selected = null;
         ui.hints = [];
@@ -378,6 +385,63 @@
     document.addEventListener('pointerdown', function unlock() {
       Sound.unlock();
       document.removeEventListener('pointerdown', unlock);
+    });
+  }
+
+  /* ---------------- 对局入口 ---------------- */
+  function entryMsg(text, good) {
+    var el = document.getElementById('entryMsg');
+    if (!el) return;
+    el.textContent = text || '';
+    el.classList.toggle('good', !!good);
+  }
+
+  function showEntry() {
+    var el = document.getElementById('entry');
+    if (el) el.classList.remove('is-hidden');
+  }
+
+  function hideEntry() {
+    var el = document.getElementById('entry');
+    if (el) el.classList.add('is-hidden');
+  }
+
+  function startSolo() {
+    soloActive = true;
+    hideEntry();
+    newGame(true);
+  }
+
+  function stopSolo() {
+    soloActive = false;
+  }
+
+  function loadScript(src) {
+    return new Promise(function (resolve, reject) {
+      var s = document.createElement('script');
+      s.src = src;
+      s.onload = resolve;
+      s.onerror = function () { reject(new Error('脚本加载失败')); };
+      document.head.appendChild(s);
+    });
+  }
+
+  function startOnline(mode) {
+    var name = (document.getElementById('nickInput').value || '').trim() || '指挥官';
+    var code = (document.getElementById('roomCodeInput').value || '').replace(/\D/g, '');
+    if (mode === 'join' && !/^\d{4}$/.test(code)) {
+      entryMsg('请输入 4 位房号');
+      return;
+    }
+    stopSolo();
+    entryMsg('正在连接联机服务…', true);
+
+    loadScript('/socket.io/socket.io.js').then(function () {
+      if (!root.JunqiOnline) throw new Error('联机模块未加载');
+      hideEntry();
+      root.JunqiOnline.start({ mode: mode, code: code, name: name });
+    }).catch(function () {
+      entryMsg('联机需用 npm run online 启动服务，直接打开 html 只能玩单机');
     });
   }
 
@@ -393,7 +457,18 @@
 
     Render.init();
     bind();
-    newGame(false);
+
+    document.getElementById('soloBtn').addEventListener('click', startSolo);
+    document.getElementById('createRoomBtn').addEventListener('click', function () { startOnline('create'); });
+    document.getElementById('joinRoomBtn').addEventListener('click', function () { startOnline('join'); });
+    document.getElementById('roomCodeInput').addEventListener('keydown', function (e) {
+      if (e.key === 'Enter') startOnline('join');
+    });
+
+    root.JunqiSolo = { start: startSolo, stop: stopSolo };
+    root.JunqiToast = toast;
+    root.JunqiSound = Sound;
+    root.JunqiEntry = { show: showEntry, hide: hideEntry, message: entryMsg };
   }
 
   if (document.readyState === 'loading') {

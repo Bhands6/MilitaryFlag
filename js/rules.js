@@ -310,7 +310,7 @@
     return out;
   }
 
-  root.JunqiRules = {
+  var api = {
     ROWS: ROWS, COLS: COLS,
     ARMY: ARMY, META: META,
     CAMPS: CAMPS, HQS: HQS, CAMP_SET: CAMP_SET, HQ_SET: HQ_SET,
@@ -321,4 +321,7 @@
     canPlace: canPlace, cellsOfSide: cellsOfSide, randomDeploy: randomDeploy,
     destinations: destinations, judge: judge, allCells: allCells
   };
+
+  root.JunqiRules = api;
+  if (typeof module !== 'undefined' && module.exports) module.exports = api;
 })(typeof globalThis !== 'undefined' ? globalThis : this);

@@ -5,7 +5,8 @@
 (function (root) {
   'use strict';
 
-  var R = root.JunqiRules;
+  var R = root.JunqiRules ||
+    (typeof require === 'function' ? require('./rules.js') : null);
 
   function sideTag(side) {
     return '<b class="' + (side === 'red' ? 'rd' : 'bl') + '">' + R.sideName(side) + '</b>';
@@ -52,8 +53,9 @@
     });
   };
 
-  Game.prototype.addLog = function (type, html) {
-    this.log.push({ type: type, html: html, round: this.round });
+  /** scope 指定可见方；布阵调整只让本方看到，避免联机时泄露阵型 */
+  Game.prototype.addLog = function (type, html, scope) {
+    this.log.push({ type: type, html: html, round: this.round, scope: scope || null });
   };
 
   Game.prototype.pieceAt = function (cell) {
@@ -93,15 +95,20 @@
 
   /* ---------------- 布阵操作 ---------------- */
   Game.prototype.swap = function (a, b) {
+    return this.swapSide('red', a, b);
+  };
+
+  /** 联机双方都需要在布阵期交换自己的棋子 */
+  Game.prototype.swapSide = function (side, a, b) {
     if (this.phase !== 'setup') return false;
     var pa = this.board.get(a), pb = this.board.get(b);
     if (!pa || !pb) return false;
-    if (pa.side !== 'red' || pb.side !== 'red') return false;
-    if (!R.canPlace('red', pa.name, b) || !R.canPlace('red', pb.name, a)) return false;
+    if (pa.side !== side || pb.side !== side) return false;
+    if (!R.canPlace(side, pa.name, b) || !R.canPlace(side, pb.name, a)) return false;
 
     this.board.set(a, pb);
     this.board.set(b, pa);
-    this.addLog('sys', '红方调整阵型：<b>' + pa.name + '</b> ⇄ <b>' + pb.name + '</b>');
+    this.addLog('sys', R.sideName(side) + '调整阵型：<b>' + pa.name + '</b> ⇄ <b>' + pb.name + '</b>', side);
     return true;
   };
 
@@ -121,7 +128,7 @@
         moved: false
       });
     });
-    this.addLog('sys', '红方重新布阵完毕（随机阵型）');
+    this.addLog('sys', '红方重新布阵完毕（随机阵型）', 'red');
     return true;
   };
 
@@ -307,11 +314,15 @@
     }
   };
 
-  Game.prototype.resign = function () {
+  Game.prototype.resignSide = function (side) {
     if (this.phase !== 'playing') return false;
-    this.addLog('sys', '红方认输');
-    this.endGame('blue', '红方认输');
+    this.addLog('sys', R.sideName(side) + '认输');
+    this.endGame(R.other(side), R.sideName(side) + '认输');
     return true;
+  };
+
+  Game.prototype.resign = function () {
+    return this.resignSide('red');
   };
 
   Game.prototype.endGame = function (winner, reason) {
@@ -328,5 +339,7 @@
     return '<span class="hl">' + String.fromCharCode(97 + p[1]) + (p[0] + 1) + '</span>';
   }
 
-  root.JunqiEngine = { Game: Game, coordLabel: coordLabel };
+  var api = { Game: Game, coordLabel: coordLabel };
+  root.JunqiEngine = api;
+  if (typeof module !== 'undefined' && module.exports) module.exports = api;
 })(typeof globalThis !== 'undefined' ? globalThis : this);

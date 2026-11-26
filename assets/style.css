@@ -370,6 +370,67 @@ body::after{
 .site-foot a{color:rgba(242,234,218,.62);text-decoration:none;border-bottom:1px dotted rgba(242,234,218,.4)}
 .site-foot a:hover{color:var(--brass);border-color:var(--brass)}
 
+/* ---------- 对局入口 ---------- */
+.entry{
+  position:fixed;inset:0;z-index:960;display:flex;align-items:center;justify-content:center;
+  padding:22px;background:rgba(20,25,18,.88);backdrop-filter:blur(5px)
+}
+.entry.is-hidden{display:none}
+.entry-card{
+  width:min(470px,100%);background:var(--paper-2);color:var(--ink);
+  border:3px solid var(--ink);border-radius:14px;box-shadow:10px 10px 0 rgba(0,0,0,.5);
+  padding:26px 26px 22px;text-align:center;position:relative
+}
+.entry-card::before,.entry-card::after{
+  content:"";position:absolute;width:11px;height:11px;border-radius:50%;
+  background:radial-gradient(circle at 35% 30%,#F6EED6,#9C8A5E);border:2px solid rgba(34,32,26,.5)
+}
+.entry-card::before{top:11px;left:11px}
+.entry-card::after{top:11px;right:11px}
+.entry-kicker{font-family:var(--font-mono);font-size:10px;letter-spacing:.34em;color:var(--muted)}
+.entry-card h2{
+  font-family:var(--font-display);font-size:32px;letter-spacing:.14em;margin:8px 0 4px;
+  color:var(--ink);text-shadow:2px 2px 0 rgba(217,164,65,.45)
+}
+.entry-sub{font-size:12px;line-height:1.7;color:#61583F;margin-bottom:18px}
+.entry-input{
+  width:100%;font-family:var(--font-body);font-size:14px;color:var(--ink);
+  background:var(--paper);border:2.5px solid var(--ink);border-radius:7px;
+  padding:11px 13px;outline:none;margin-bottom:12px
+}
+.entry-input:focus,.entry-code:focus{border-color:var(--red);box-shadow:0 0 0 3px rgba(195,63,44,.16)}
+.entry-solo{width:100%;font-size:16px;padding:13px}
+.entry-split{
+  display:flex;align-items:center;gap:12px;margin:18px 0 14px;
+  font-family:var(--font-mono);font-size:10px;letter-spacing:.2em;color:var(--muted)
+}
+.entry-split span{flex:1;height:1px;background:rgba(34,32,26,.25)}
+.entry-room{display:flex;align-items:center;gap:8px;justify-content:center}
+.entry-card .btn-ghost{color:var(--ink);border-color:var(--ink);background:rgba(34,32,26,.06)}
+.entry-card .btn-ghost:hover{background:rgba(217,164,65,.3)}
+.entry-room .btn{padding:10px 13px;font-size:13.5px;white-space:nowrap}
+.entry-slash{font-family:var(--font-mono);font-size:12px;color:var(--muted)}
+.entry-code{
+  width:92px;flex:none;text-align:center;text-transform:uppercase;
+  font-family:var(--font-mono);font-size:17px;letter-spacing:.18em;color:var(--ink);
+  background:var(--paper);border:2.5px solid var(--ink);border-radius:7px;padding:10px 6px;outline:none
+}
+.entry-msg{
+  min-height:19px;margin-top:12px;font-family:var(--font-mono);font-size:11px;
+  letter-spacing:.08em;color:var(--red);line-height:1.6
+}
+.entry-msg.good{color:#8A6A1E}
+.entry-tip{
+  margin-top:8px;padding-top:11px;border-top:1.5px dashed rgba(34,32,26,.25);
+  font-family:var(--font-mono);font-size:9.5px;letter-spacing:.08em;color:var(--muted)
+}
+
+.room-chip{
+  font-family:var(--font-mono);font-size:11px;letter-spacing:.14em;color:var(--cream);
+  border:2px solid var(--brass);border-radius:6px;padding:8px 12px;background:rgba(217,164,65,.12)
+}
+.room-chip b{font-size:15px;color:var(--brass);letter-spacing:.2em}
+
 @media (max-width:1160px){
   .game{grid-template-columns:1fr}
   .stage{order:-1}

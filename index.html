@@ -13,6 +13,29 @@
 </head>
 <body>
 
+<!-- 对局入口：单机 / 建房 / 凭房号加入 -->
+<div class="entry" id="entry">
+  <div class="entry-card">
+    <div class="entry-kicker">FIELD COMMAND · READY</div>
+    <h2>选择对局方式</h2>
+    <p class="entry-sub">填个昵称，单机推演，或用 4 位房号与好友联机对局</p>
+    <input class="entry-input" id="nickInput" maxlength="12" autocomplete="off" placeholder="你的昵称（默认：指挥官）">
+
+    <button class="btn btn-brass entry-solo" id="soloBtn" type="button">单机对战 · 挑战 AI</button>
+
+    <div class="entry-split"><span></span>或联机对战<span></span></div>
+    <div class="entry-room">
+      <button class="btn btn-ghost" id="createRoomBtn" type="button">创建房间</button>
+      <span class="entry-slash">/</span>
+      <input class="entry-code" id="roomCodeInput" maxlength="4" inputmode="numeric" autocomplete="off" placeholder="房号">
+      <button class="btn btn-ghost" id="joinRoomBtn" type="button">加入</button>
+    </div>
+
+    <p class="entry-msg" id="entryMsg"></p>
+    <p class="entry-tip">房主执红先行 · 把 4 位房号发给好友即可开局</p>
+  </div>
+</div>
+
 <div class="ticker" aria-hidden="true">
   <div class="ticker-track">
     <span>暗棋模式 · 双方未知</span><span>夺旗即胜 · 司令阵亡亮旗</span><span>工兵飞铁路 · 行营是安全岛</span><span>红方先行 · 山界仅三处可越</span><span>沙盘推演 · 战报全程记录</span>
@@ -192,5 +215,6 @@
 <script src="js/ai.js"></script>
 <script src="js/render.js"></script>
 <script src="js/app.js"></script>
+<script src="js/online.js"></script>
 </body>
 </html>

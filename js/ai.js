@@ -279,9 +279,11 @@
     return best;
   }
 
-  root.JunqiAI = {
+  var api = {
     LEVELS: LEVELS,
     choose: choose,
     levelOf: function (key) { return LEVELS[key] || LEVELS.normal; }
   };
+  root.JunqiAI = api;
+  if (typeof module !== 'undefined' && module.exports) module.exports = api;
 })(typeof globalThis !== 'undefined' ? globalThis : this);

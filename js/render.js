@@ -194,7 +194,8 @@
       node.style.left = leftPct(pos[0]);
       node.style.top = topPct(pos[1]);
 
-      var hidden = p.side === 'blue' && !p.revealed && !(p.name === '军旗' && game.flagRevealed.blue);
+      var hidden = !!p.hidden ||
+        (p.side === 'blue' && !p.revealed && !(p.name === '军旗' && game.flagRevealed.blue));
       var cls = 'piece ' + p.side;
       if (hidden) cls += ' hidden';
       // 只在棋子公开时才用军旗配色，否则会从底色泄露旗位
@@ -253,14 +254,24 @@
     el.blueFlagChip.classList.toggle('hot', game.flagRevealed.blue);
 
     var level = (root.JunqiAI && root.JunqiAI.levelOf(ui.level)) || { label: '老兵' };
-    el.levelChip.innerHTML = '对手 <b>' + level.label + '</b>';
-    el.aiName.textContent = 'AI · ' + level.label + ' / 阵地右翼';
+    if (ui.mode === 'online') {
+      el.levelChip.innerHTML = '对手 <b>玩家</b>';
+      var foe = game.players && game.you ? game.players[game.you === 'red' ? 'blue' : 'red'] : null;
+      el.aiName.textContent = foe
+        ? (foe.name + (foe.connected ? ' / 联机中' : ' / 掉线'))
+        : '等待对手加入';
+    } else {
+      el.levelChip.innerHTML = '对手 <b>' + level.label + '</b>';
+      el.aiName.textContent = 'AI · ' + level.label + ' / 阵地右翼';
+    }
 
     var phaseText = '布阵';
     var turnText = '布阵阶段 · 红方整备';
     if (game.phase === 'playing') {
       phaseText = '交战';
-      turnText = game.turn === 'red' ? '红方行棋 · 你先走' : '蓝方推演中 · 请稍候';
+      turnText = ui.mode === 'online'
+        ? (game.myTurn ? '轮到你行棋 · 请落子' : '等待对手行棋…')
+        : (game.turn === 'red' ? '红方行棋 · 你先走' : '蓝方推演中 · 请稍候');
     } else if (game.phase === 'over') {
       phaseText = '终局';
       turnText = '对局结束 · ' + (game.winner ? (game.winner === 'red' ? '红方胜利' : '蓝方胜利') : '和棋');
@@ -270,9 +281,13 @@
     el.turnChip.classList.toggle('blue-turn', game.phase !== 'setup' && game.turn === 'blue');
 
     if (game.phase === 'setup') {
-      el.stageNote.textContent = '点击两枚己方棋子可交换位置 · 军旗须在大本营 · 地雷须在最后两列';
+      el.stageNote.textContent = ui.mode === 'online'
+        ? '点击两枚己方棋子交换位置 · 摆好后点「准备开始」，双方就绪即开局'
+        : '点击两枚己方棋子可交换位置 · 军旗须在大本营 · 地雷须在最后两列';
     } else if (game.phase === 'playing') {
-      if (game.turn === 'blue') {
+      if (ui.mode === 'online' && !game.myTurn) {
+        el.stageNote.textContent = '对手正在落子，请稍候…';
+      } else if (ui.mode === 'solo' && game.turn === 'blue') {
         el.stageNote.textContent = '蓝方指挥部正在推演，请稍候…';
       } else if (ui.selected) {
         var sp = game.board.get(ui.selected);
@@ -298,6 +313,36 @@
   }
 
   function renderToolbar(game, ui) {
+    if (ui.mode === 'online') {
+      var me = game.players && game.you ? game.players[game.you] : null;
+      var foe = game.players && game.you ? game.players[game.you === 'red' ? 'blue' : 'red'] : null;
+      var roomTag = '<span class="room-chip">房号 <b>' + (game.code || '----') + '</b></span>';
+      var leave = '<button type="button" class="btn btn-ghost" data-act="leave">离开房间</button>';
+
+      if (game.phase === 'setup') {
+        var ready = !!(me && me.ready);
+        var foeText = !foe ? '等待对手加入房间…'
+          : (foe.connected ? ('对手：' + foe.name + (foe.ready ? '（已准备）' : '（布阵中）')) : '对手掉线，等待重连…');
+        el.toolbar.innerHTML = roomTag +
+          '<button type="button" class="btn ' + (ready ? 'btn-ghost' : 'btn-brass') + '" data-act="ready"' + (ready ? ' disabled' : '') + '>' +
+          (ready ? '已准备 · 等待对手' : '准备开始') + '</button>' +
+          '<span class="tool-note">' + foeText + '</span>' +
+          '<span class="spacer"></span>' + leave;
+      } else if (game.phase === 'playing') {
+        el.toolbar.innerHTML = roomTag +
+          '<span class="tool-note">' + (game.myTurn ? '轮到你行棋' : '等待对手行棋…') + '</span>' +
+          '<span class="spacer"></span>' +
+          '<button type="button" class="btn btn-ghost" data-act="resign">认输</button>' + leave;
+      } else {
+        var verdict = game.winner ? (game.winner === 'red' ? '红方获胜' : '蓝方获胜') : '和棋';
+        el.toolbar.innerHTML = roomTag +
+          '<button type="button" class="btn btn-red" data-act="rematch">再来一局</button>' +
+          '<span class="spacer"></span>' +
+          '<span class="tool-note">' + verdict + ' · ' + game.reason + '</span>' + leave;
+      }
+      return;
+    }
+
     if (game.phase === 'setup') {
       el.toolbar.innerHTML =
         '<button type="button" class="btn btn-brass" data-act="shuffle">随机布阵</button>' +
