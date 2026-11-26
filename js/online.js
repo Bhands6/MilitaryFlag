@@ -263,7 +263,9 @@
       bound = true;
     }
 
-    socket = io({ transports: ['websocket', 'polling'] });
+    var ioOpts = { transports: ['websocket', 'polling'] };
+    if (root.JunqiShareCode) ioOpts.query = { sharecode: root.JunqiShareCode };
+    socket = io(ioOpts);
 
     socket.on('connect', function () {
       var payload = { key: key, name: opts.name };

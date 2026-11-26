@@ -207,7 +207,8 @@ F:/UE/MilitaryFlag/
 │   ├── ai.js                 # 暗棋 AI：信念池、期望值、风险评估
 │   ├── render.js             # SVG 棋盘绘制与界面渲染
 │   ├── app.js                # 单机交互、音效、回合调度、入口切换
-│   └── online.js             # 联机客户端：连接、状态同步、走子发送
+│   ├── online.js             # 联机客户端：连接、状态同步、走子发送
+│   └── socket.io.min.js      # 客户端副本，主路径失效时降级加载
 ├── docs/
 │   ├── preview.png           # 交战画面截图
 │   └── screenshot-setup.jpg  # 布阵阶段截图

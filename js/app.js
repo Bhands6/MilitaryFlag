@@ -436,13 +436,28 @@
     stopSolo();
     entryMsg('正在连接联机服务…', true);
 
-    loadScript('/socket.io/socket.io.js').then(function () {
-      if (!root.JunqiOnline) throw new Error('联机模块未加载');
-      hideEntry();
-      root.JunqiOnline.start({ mode: mode, code: code, name: name });
-    }).catch(function () {
-      entryMsg('联机需用 npm run online 启动服务，直接打开 html 只能玩单机');
-    });
+    // 云端分享链接靠 ?sharecode= 鉴权，脚本子请求和握手都要带上
+    var shareCode = '';
+    try {
+      shareCode = new URLSearchParams(location.search).get('sharecode') || '';
+      if (!shareCode) {
+        var m = /[?&]sharecode=([^&#]+)/.exec(document.referrer || '');
+        if (m) shareCode = decodeURIComponent(m[1]);
+      }
+    } catch (e) { /* 老浏览器忽略 */ }
+    root.JunqiShareCode = shareCode;
+    var q = shareCode ? '?sharecode=' + encodeURIComponent(shareCode) : '';
+
+    loadScript('/socket.io/socket.io.js' + q)
+      .catch(function () { return loadScript('/js/socket.io.min.js' + q); })
+      .then(function () {
+        if (!root.JunqiOnline) throw new Error('联机模块未加载');
+        hideEntry();
+        root.JunqiOnline.start({ mode: mode, code: code, name: name });
+      })
+      .catch(function () {
+        entryMsg('联机需用 npm run online 启动服务，直接打开 html 只能玩单机');
+      });
   }
 
   /* ---------------- 启动 ---------------- */
