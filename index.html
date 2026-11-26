@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>军旗 · 陆战棋沙盘对决</title>
+<meta name="description" content="纯前端单机军旗（陆战棋）网页游戏：暗棋对局、行营安全岛、铁路运输、工兵飞铁路，AI 在不确定信息下推演。">
+<link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Noto+Serif+SC:wght@400;600;700&family=ZCOOL+QingKe+HuangYou&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+
+<div class="ticker" aria-hidden="true">
+  <div class="ticker-track">
+    <span>暗棋模式 · 双方未知</span><span>夺旗即胜 · 司令阵亡亮旗</span><span>工兵飞铁路 · 行营是安全岛</span><span>红方先行 · 山界仅三处可越</span><span>沙盘推演 · 战报全程记录</span>
+    <span>暗棋模式 · 双方未知</span><span>夺旗即胜 · 司令阵亡亮旗</span><span>工兵飞铁路 · 行营是安全岛</span><span>红方先行 · 山界仅三处可越</span><span>沙盘推演 · 战报全程记录</span>
+  </div>
+</div>
+
+<header class="topbar">
+  <div class="brand">
+    <div class="brand-mark">
+      <svg width="34" height="34" viewBox="0 0 34 34" fill="none" stroke="#D9A441" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M7 4v26"/><path d="M7 5h17l-4.5 6L24 17H7"/><path d="M4 30h10"/>
+      </svg>
+    </div>
+    <div class="brand-text">
+      <h1>军 旗<span class="sub">陆战棋 · FIELD COMMAND</span></h1>
+      <div class="brand-meta">
+        <span class="chip chip-on">模式 <b>暗棋</b></span>
+        <span class="chip">回合 <b id="roundNum">0</b></span>
+        <span class="chip" id="phaseChip">阶段 <b>布阵</b></span>
+        <span class="chip" id="levelChip">对手 <b>老兵</b></span>
+      </div>
+    </div>
+    <div class="stamp" aria-hidden="true">沙盘推演</div>
+  </div>
+  <div class="top-actions">
+    <button class="icon-btn" id="soundBtn" type="button" aria-pressed="true" aria-label="音效开关" title="音效开关">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M4 9.5v5h3.6L13 19V5L7.6 9.5H4z"/>
+        <path d="M16.6 8.6a4.8 4.8 0 0 1 0 6.8"/>
+        <path class="slash" d="M3 3l18 18"/>
+      </svg>
+    </button>
+    <button class="btn btn-ghost" id="newGameBtn" type="button">新对局</button>
+    <div class="me-chip">
+      <span class="vs-flag" style="background:linear-gradient(160deg,var(--red-hi),var(--red));width:32px;height:32px;border-radius:5px">红</span>
+      红方 · 你
+    </div>
+  </div>
+</header>
+
+<main class="game">
+
+  <!-- ============ 左列 ============ -->
+  <aside class="col-left">
+    <section class="panel">
+      <div class="panel-head"><h2>作战双方</h2><span class="tag">VS</span></div>
+
+      <div class="vs-row">
+        <span class="vs-flag" style="background:linear-gradient(160deg,var(--red-hi),var(--red))">红</span>
+        <span class="vs-name"><b>红方 · 你</b><small>先手 / 阵地左翼</small></span>
+        <span class="vs-num" id="redCount">25</span>
+      </div>
+      <div class="meter"><i class="m-red" id="meterRed" style="width:50%"></i><i class="m-blue" id="meterBlue" style="width:50%"></i></div>
+      <div class="vs-row">
+        <span class="vs-flag" style="background:linear-gradient(160deg,var(--blue-hi),var(--blue))">蓝</span>
+        <span class="vs-name"><b>蓝方 · 指挥部</b><small id="aiName">AI / 阵地右翼</small></span>
+        <span class="vs-num" id="blueCount">25</span>
+      </div>
+
+      <div style="display:flex;gap:8px;margin-top:12px;flex-wrap:wrap">
+        <span class="vs-flagchip" id="redFlagChip">红军旗 未暴露</span>
+        <span class="vs-flagchip" id="blueFlagChip">蓝军旗 未暴露</span>
+      </div>
+
+      <div class="grave-block">
+        <div class="grave-row">
+          <span class="grave-label">红方战损</span>
+          <span class="grave-list" id="redGrave"><span class="grave-empty">—</span></span>
+        </div>
+        <div class="grave-row">
+          <span class="grave-label">蓝方战损</span>
+          <span class="grave-list" id="blueGrave"><span class="grave-empty">—</span></span>
+        </div>
+      </div>
+    </section>
+
+    <section class="panel">
+      <div class="panel-head"><h2>军衔对照</h2><span class="tag">25 子</span></div>
+      <div class="rank-strip">
+        <span class="rank-chip">司令<small>1</small></span>
+        <span class="rank-chip">军长<small>1</small></span>
+        <span class="rank-chip">师长<small>2</small></span>
+        <span class="rank-chip">旅长<small>2</small></span>
+        <span class="rank-chip">团长<small>2</small></span>
+        <span class="rank-chip">营长<small>2</small></span>
+        <span class="rank-chip">连长<small>3</small></span>
+        <span class="rank-chip">排长<small>3</small></span>
+        <span class="rank-chip">工兵<small>3</small></span>
+        <span class="rank-chip sp">炸弹<small>2</small></span>
+        <span class="rank-chip sp">地雷<small>3</small></span>
+        <span class="rank-chip sp">军旗<small>1</small></span>
+      </div>
+      <p class="rank-note">
+        大小：司令 &gt; 军长 &gt; 师长 &gt; 旅长 &gt; 团长 &gt; 营长 &gt; 连长 &gt; 排长 &gt; 工兵<br>
+        特例：工兵挖雷 · 炸弹同归于尽 · 地雷与军旗不可移动
+      </p>
+    </section>
+  </aside>
+
+  <!-- ============ 中列 ============ -->
+  <section class="stage">
+    <div class="status-strip">
+      <div class="turn-chip" id="turnChip"><span class="dot"></span><span id="turnText">布阵阶段 · 红方整备</span></div>
+      <div class="stage-note" id="stageNote">点击两枚己方棋子可交换位置 · 军旗须在大本营 · 地雷须在最后两列</div>
+    </div>
+
+    <div class="board-card">
+      <div class="board-caption" aria-hidden="true">
+        <span class="cap-red">RED · 红方阵地</span>
+        <span class="cap-mid">山 界</span>
+        <span class="cap-blue">蓝方阵地 · BLUE</span>
+      </div>
+      <div class="board-scroll">
+        <div class="board" id="board" tabindex="0" aria-label="陆战棋棋盘，12 乘 5 格">
+          <svg id="boardSvg" viewBox="0 0 1200 500" preserveAspectRatio="xMidYMid meet" aria-hidden="true"></svg>
+          <div id="hintLayer" aria-hidden="true"></div>
+          <div id="pieceLayer" aria-hidden="true"></div>
+          <div class="overlay" id="overlay">
+            <div class="ov-kicker" id="ovKicker">BATTLE REPORT</div>
+            <div class="ov-title" id="ovTitle">胜负已分</div>
+            <div class="ov-note" id="ovNote"></div>
+            <div class="ov-stats" id="ovStats"></div>
+            <div class="ov-actions">
+              <button class="btn btn-brass" type="button" data-act="again">再来一局</button>
+              <button class="btn btn-ghost" type="button" data-act="close">查看棋盘</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="toolbar" id="toolbar"></div>
+
+    <div class="legend">
+      <span class="lg"><span class="sw sw-rail"></span>铁路 · 直线任意步</span>
+      <span class="lg"><span class="sw sw-road"></span>公路 · 每次一步</span>
+      <span class="lg"><span class="sw sw-camp"></span>行营 · 安全岛</span>
+      <span class="lg"><span class="sw sw-hq"></span>大本营 · 入内不可动</span>
+      <span class="lg"><span class="sw sw-front"></span>山界 · 仅三处可越</span>
+    </div>
+  </section>
+
+  <!-- ============ 右列 ============ -->
+  <aside class="col-right">
+    <section class="panel log-panel">
+      <div class="panel-head"><h2>战报</h2><span class="tag" id="logTag">LIVE</span></div>
+      <ul class="log-list" id="logList"></ul>
+    </section>
+
+    <section class="panel">
+      <div class="panel-head"><h2>规则速览</h2><span class="tag">R-01</span></div>
+      <ul class="rules">
+        <li><b>布阵</b>：军旗必居两座大本营之一；地雷只能放在己方最后两列；炸弹不能放最前一列。</li>
+        <li><b>行棋</b>：公路每次一步；铁路上可直线任意步；工兵在铁路上可任意转弯，俗称飞铁路。</li>
+        <li><b>山界</b>：两侧前线只在三条通道相接（a、c、e 列），其余位置不可越界。</li>
+        <li><b>行营</b>：营中棋子受绝对保护，敌方不可攻入；营与四角斜向相通，可主动出击。</li>
+        <li><b>大本营</b>：棋子进入后不能再移动（军旗与地雷本就不可移动）。</li>
+        <li><b>交战</b>：大吃小、同级同归于尽；工兵挖雷存活；炸弹与任何子同归于尽。</li>
+        <li><b>胜负</b>：夺旗即胜；一方无棋可走判负；司令阵亡须亮出军旗位置。</li>
+        <li><b>和棋</b>：连续 50 回合无接触，判和，避免双方在铁路口无限对峙。</li>
+        <li><b>说明</b>：单机推演版，蓝方 AI 只依据公开信息推演，不会偷看你的暗棋。</li>
+      </ul>
+    </section>
+  </aside>
+</main>
+
+<footer class="site-foot">
+  <span>陆战棋 SANPAN DUEL · 纯前端单机版</span>
+  <span>规则参考 <a href="https://github.com/samuelyuan/online-junqi" target="_blank" rel="noopener">samuelyuan/online-junqi</a>（MIT）</span>
+</footer>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script src="js/rules.js"></script>
+<script src="js/engine.js"></script>
+<script src="js/ai.js"></script>
+<script src="js/render.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,12 @@
+{
+  "name": "military-flag-junqi",
+  "version": "1.0.0",
+  "private": true,
+  "description": "纯前端单机军旗（陆战棋）网页游戏：暗棋、行营、铁路、工兵飞铁路，AI 在不确定信息下推演",
+  "scripts": {
+    "start": "node scripts/serve.js",
+    "test": "node tests/run.js"
+  },
+  "keywords": ["junqi", "luzhanqi", "军旗", "陆战棋", "game", "vanilla-js"],
+  "license": "MIT"
+}
