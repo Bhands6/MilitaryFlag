@@ -111,15 +111,6 @@ npm start          # 打开 http://localhost:3000
 
 ---
 
-## 🖼️ 界面一览
-
-<div align="center">
-
-<img src="docs/screenshot-setup.jpg" alt="布阵阶段截图" width="820">
-
-<p align="center">🖌️ 布阵阶段：红方 25 子就位（军旗为金色棋子），蓝方全部以 <code>？？</code> 隐藏</p>
-
-</div>
 
 | 区域 | 内容 | 作用 |
 |------|------|------|
@@ -209,11 +200,6 @@ npm test        # 56 项检查，零依赖
 - **单房间概念**：不涉及账号、房间号与跨设备同步
 
 ---
-
-## 🙏 参考与致谢
-
-- 规则与棋盘几何参考了 [samuelyuan/online-junqi](https://github.com/samuelyuan/online-junqi)（MIT，Copyright © 2016 Samuel Yuan），本项目在同一套棋盘模型上做了转置实现与前端重构
-- 字体：站酷庆科黄油体、Noto Serif SC、JetBrains Mono（Google Fonts）
 
 ## 📄 许可
 
